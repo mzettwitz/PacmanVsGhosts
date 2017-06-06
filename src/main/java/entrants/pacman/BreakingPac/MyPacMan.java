@@ -1,4 +1,4 @@
-package entrants.pacman.username;
+package entrants.pacman.BreakingPac;
 
 import pacman.controllers.PacmanController;
 import pacman.game.Constants.MOVE;
@@ -10,7 +10,7 @@ import pacman.game.Game;
  * be placed in this package or sub-packages (e.g., entrants.pacman.username).
  */
 public class MyPacMan extends PacmanController {
-    private MOVE myMove = MOVE.NEUTRAL;
+    private MOVE myMove = MOVE.LEFT;
 
     public MOVE getMove(Game game, long timeDue) {
         //Place your game logic here to play the game as Ms Pac-Man
