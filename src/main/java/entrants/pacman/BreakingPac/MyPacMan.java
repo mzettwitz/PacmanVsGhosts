@@ -1,5 +1,7 @@
 package entrants.pacman.BreakingPac;
 
+import java.util.ArrayList;
+
 import pacman.controllers.PacmanController;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
@@ -10,19 +12,54 @@ import pacman.game.Game;
  * be placed in this package or sub-packages (e.g., entrants.pacman.username).
  */
 public class MyPacMan extends PacmanController {
-    private MOVE myMove = MOVE.LEFT;
+    private Mapping m_map;
+    private Policy m_policy;    
 
     
     
     // Constructor: 100ms to compute: build up initial map
     public MyPacMan()
     {
-    	
     }
     
     public MOVE getMove(Game game, long timeDue) {
         //Place your game logic here to play the game as Ms Pac-Man
 
-        return myMove;
+    	
+    	MOVE[] moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
+    	for (MOVE move : moves)
+    	{
+    		// move down if possible, else move left
+    		if(move == MOVE.DOWN)
+    		{
+    			return move;
+    		}
+    	}
+        return MOVE.LEFT;
+    }
+    
+    
+    // Internal storage
+    private class Mapping
+    {
+    	Cell[] cells = new Cell [9];
+    	
+    	private class Cell
+    	{
+    		int numberGhosts = 0;
+    		int pillsAvailable = 0;
+    		int ppAvailable = 0;
+    	}
+    }
+    
+    // Internal policy
+    private class Policy
+    {
+    	int ghost = -200;
+    	int pill = 10;
+    	int step = -2;
+    	int powerPill = 10;
+    	int powerPillGhost = 100;
+    	int ppGhostMulti = -2;	// use ghost * ppMulti while PP is active
     }
 }
