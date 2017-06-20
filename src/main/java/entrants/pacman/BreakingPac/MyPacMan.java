@@ -12,6 +12,14 @@ import pacman.game.Game;
 public class MyPacMan extends PacmanController {
     private MOVE myMove = MOVE.LEFT;
 
+    
+    
+    // Constructor: 100ms to compute: build up initial map
+    public MyPacMan()
+    {
+    	
+    }
+    
     public MOVE getMove(Game game, long timeDue) {
         //Place your game logic here to play the game as Ms Pac-Man
 
