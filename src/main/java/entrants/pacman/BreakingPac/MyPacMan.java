@@ -3,6 +3,7 @@ package entrants.pacman.BreakingPac;
 import java.util.ArrayList;
 
 import pacman.controllers.PacmanController;
+import pacman.controllers.examples.po.POCommGhosts;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 
@@ -25,7 +26,6 @@ public class MyPacMan extends PacmanController {
     public MOVE getMove(Game game, long timeDue) {
         //Place your game logic here to play the game as Ms Pac-Man
 
-    	
     	MOVE[] moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
     	for (MOVE move : moves)
     	{
@@ -35,7 +35,15 @@ public class MyPacMan extends PacmanController {
     			return move;
     		}
     	}
+    	
         return MOVE.LEFT;
+    }
+    
+    
+    private int computeMove(int currentStep, int maxSteps, MOVE move, Game game)
+    {
+    	game.advanceGame(MOVE.LEFT, new POCommGhosts(40).getMove(game, 40));
+    	return 0;
     }
     
     
