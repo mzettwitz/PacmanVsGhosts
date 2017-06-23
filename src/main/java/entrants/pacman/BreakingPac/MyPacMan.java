@@ -22,7 +22,10 @@ public class MyPacMan extends PacmanController {
 	private Mapping m_map;
 	private Policy m_policy;    
 	private MASController m_ghosts;
-	private ArrayList<Integer> m_visitedNodes; 
+	private int [] m_visitedNodes;
+	private int m_maxLookahead;
+	private int m_maxNegPoints;
+	private int m_minNegPoints;
 
 
 	// Constructor: 100ms to compute: build up initial map
@@ -31,11 +34,16 @@ public class MyPacMan extends PacmanController {
 		m_policy = new Policy();
 		m_map = new Mapping();
 		m_ghosts = new POCommGhosts(50);
-		m_visitedNodes = new ArrayList<Integer>();	//TODO: store the times a node has been visited
+		m_maxLookahead = 5;
+		m_maxNegPoints = (m_maxLookahead-1)*m_policy.pill + m_policy.ghost;
+		m_minNegPoints = m_maxLookahead * m_policy.step;
 	}
 
 	public MOVE getMove(Game game, long timeDue) {
 		//Place your game logic here to play the game as Ms Pac-Man
+		if(game.getCurrentLevelTime() < 1)
+			m_visitedNodes = new int [game.getNumberOfNodes()];
+
 
 		MOVE [] _moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
 		ArrayList<MOVE> moves = new ArrayList<MOVE>();
@@ -61,11 +69,10 @@ public class MyPacMan extends PacmanController {
 		// simulate all moves
 		for (int i = 0; i < moves.size(); i++)
 		{
-			rewardedMoves.add(i, new Pair<Integer, MOVE>());
-			rewardedMoves.get(i).first = computeMove(0, 3, moves.get(i), nodeIdx, simGame);
-			rewardedMoves.get(i).second = moves.get(i);
+			rewardedMoves.add(i, new Pair<Integer, MOVE>(computeMove(0, m_maxLookahead, moves.get(i), nodeIdx, simGame), moves.get(i)));
 		}
 
+		Pair<Integer, MOVE> localExplore = new Pair<Integer, MOVE>(Integer.MAX_VALUE,rewardedMoves.get(0).second);
 		// sort moves to get best moves in ascending order
 		sortRewardedMoves(rewardedMoves);
 		// loop descending 
@@ -74,32 +81,26 @@ public class MyPacMan extends PacmanController {
 			// check if next node was visited before
 			int neighbor = game.getNeighbour(nodeIdx, rewardedMoves.get(i).second);
 			// add next node to visited nodes
-			if(!m_visitedNodes.contains(neighbor))
+			if(m_visitedNodes[neighbor] == 0)
 			{
-				m_visitedNodes.add(neighbor);
+				m_visitedNodes[neighbor]++;
 				return rewardedMoves.get(i).second;
+			}
+			// look for node that was visited least
+			else if(m_visitedNodes[neighbor] < localExplore.first && rewardedMoves.get(i).first > m_maxNegPoints)
+			{
+				localExplore.second = rewardedMoves.get(i).second;
+				localExplore.first = m_visitedNodes[neighbor];
 			}
 		}
 
-		// if all neighbor nodes were visited: do random step
-		// TODO: use heuristics
-		Random rnd = new Random();
-		int rndMove = 0;
-		if(game.isJunction(nodeIdx))
-		{		
-			rndMove = rnd.nextInt(moves.size());
-			while(game.getPacmanLastMoveMade() == moves.get(rndMove).opposite())
-				rndMove = rnd.nextInt(moves.size());
-		}		
-		else if(moves.contains(lastMove))
-			return lastMove;		
-		else
+		if(localExplore.first < m_minNegPoints)
 		{
-			rndMove = rnd.nextInt(moves.size());
-			while(game.getPacmanLastMoveMade() == moves.get(rndMove).opposite())
-				rndMove = rnd.nextInt(moves.size());
-		}
-		return	moves.get(rndMove);
+			m_visitedNodes[game.getNeighbour(nodeIdx, lastMove)]++;
+			return lastMove;
+		}			
+		m_visitedNodes[game.getNeighbour(nodeIdx, localExplore.second)]++;
+		return localExplore.second;
 	}
 
 
@@ -126,14 +127,14 @@ public class MyPacMan extends PacmanController {
 
 			//rewards[i] = game.getScore();
 
-			
+
 			// TODO: use better prediction (e.g. powerpill only when ghosts available, check if you can see ghosts)
 			if(gameCopies[i].wasPillEaten())
 				rewards[i] = m_policy.pill;
 			else if(gameCopies[i].wasPowerPillEaten())
 				rewards[i] = m_policy.powerPill;
 			else if(gameCopies[i].wasPacManEaten())
-				rewards[i] = m_policy.ghost;
+				return m_policy.ghost;
 			else if(gameCopies[i].wasGhostEaten(GHOST.BLINKY))
 				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
 			else if(gameCopies[i].wasGhostEaten(GHOST.SUE))
@@ -176,7 +177,7 @@ public class MyPacMan extends PacmanController {
 		int step = -2;
 		int powerPill = -50;
 		int powerPillGhost = 100;
-		int ppGhostMulti = -2;	// use ghost * ppMulti while PP is active
+		int ppGhostMulti = -2;	// use ghost * ppGhostMulti while PP is active
 	}
 
 
@@ -184,6 +185,13 @@ public class MyPacMan extends PacmanController {
 	{
 		F first;
 		S second;
+
+		Pair(F _first,S _second)
+		{
+			first = _first;
+			second = _second;
+		}
+		Pair(){}
 	}
 
 	private void sortRewardedMoves(ArrayList<Pair<Integer, MOVE> > list)
