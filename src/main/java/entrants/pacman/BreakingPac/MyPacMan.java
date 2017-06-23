@@ -31,7 +31,7 @@ public class MyPacMan extends PacmanController {
 		m_policy = new Policy();
 		m_map = new Mapping();
 		m_ghosts = new POCommGhosts(50);
-		m_visitedNodes = new ArrayList<Integer>();
+		m_visitedNodes = new ArrayList<Integer>();	//TODO: store the times a node has been visited
 	}
 
 	public MOVE getMove(Game game, long timeDue) {
@@ -62,7 +62,7 @@ public class MyPacMan extends PacmanController {
 		for (int i = 0; i < moves.size(); i++)
 		{
 			rewardedMoves.add(i, new Pair<Integer, MOVE>());
-			rewardedMoves.get(i).first = computeMove(0, 5, moves.get(i), nodeIdx, simGame);
+			rewardedMoves.get(i).first = computeMove(0, 3, moves.get(i), nodeIdx, simGame);
 			rewardedMoves.get(i).second = moves.get(i);
 		}
 
@@ -124,11 +124,11 @@ public class MyPacMan extends PacmanController {
 			if(idx == -1)
 				continue;
 
-			rewards[i] = game.getScore();
+			//rewards[i] = game.getScore();
 
-
-			/*if(gameCopies[i].wasPillEaten())
-			//if(idx != -1 && game.getPillIndex(idx) != -1 && gameCopies[i].isPillStillAvailable(game.getPillIndex(idx)))	
+			
+			// TODO: use better prediction (e.g. powerpill only when ghosts available, check if you can see ghosts)
+			if(gameCopies[i].wasPillEaten())
 				rewards[i] = m_policy.pill;
 			else if(gameCopies[i].wasPowerPillEaten())
 				rewards[i] = m_policy.powerPill;
@@ -143,7 +143,7 @@ public class MyPacMan extends PacmanController {
 			else if(gameCopies[i].wasGhostEaten(GHOST.PINKY))
 				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
 			else 
-				rewards[i] = m_policy.step;*/
+				rewards[i] = m_policy.step;
 
 
 			rewards[i] += computeMove(currentStep+1, maxSteps, moves[i], idx, gameCopies[i]);
@@ -174,7 +174,7 @@ public class MyPacMan extends PacmanController {
 		int ghost = -200;
 		int pill = 10;
 		int step = -2;
-		int powerPill = 10;
+		int powerPill = -50;
 		int powerPillGhost = 100;
 		int ppGhostMulti = -2;	// use ghost * ppMulti while PP is active
 	}
