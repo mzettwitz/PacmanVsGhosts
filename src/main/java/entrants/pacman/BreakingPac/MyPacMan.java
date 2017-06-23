@@ -205,7 +205,16 @@ public class MyPacMan extends PacmanController {
 					Pair<Integer, MOVE> tmp = list.get(j+1);
 					list.set(j+1, list.get(j));
 					list.set(j, tmp);
-				}					
+				}
+				else if(list.get(j).first == list.get(j+1).first)
+				{
+					if(list.get(j).second == lastMove)
+					{
+						Pair<Integer, MOVE> tmp = list.get(j+1);
+						list.set(j+1, list.get(j));
+						list.set(j, tmp);
+					}
+				}
 			}
 		}
 	}
