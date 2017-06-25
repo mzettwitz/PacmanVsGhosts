@@ -4,6 +4,7 @@ import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
 import pacman.game.Constants;
 import pacman.game.Game;
+import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
 /**
@@ -17,14 +18,20 @@ public class Pinky extends IndividualGhostController {
 
     @Override
     public Constants.MOVE getMove(Game game, long timeDue) {
-    	// simply obtain all possible moves(remember: ghost are only able to run forward and left/right, but stay at position
-    	MOVE[] moves = game.getPossibleMoves(game.getGhostCurrentNodeIndex(ghost), game.getGhostLastMoveMade(ghost));
-    	for (MOVE move : moves)
-    	{
-    		// move down if possible, else move left
-    		if(move == MOVE.DOWN)
-    			return move;
-    	}
-        return MOVE.LEFT;
+    	Constants.MOVE lastMove = game.getGhostLastMoveMade(GHOST.PINKY);
+    	int currentPosition = game.getGhostCurrentNodeIndex(GHOST.PINKY);
+    	int currentPacPosition = game.getPacmanCurrentNodeIndex();
+    	int targetPowerPill = game.getPowerPillIndices()[2];
+    	int distanceToPowerPill = game.getShortestPathDistance(currentPosition,targetPowerPill);
+    	int distancePacToPowerPill = game.getShortestPathDistance(currentPacPosition, targetPowerPill);
+    	if(distanceToPowerPill > distancePacToPowerPill){
+    		Constants.MOVE move = game.getNextMoveTowardsTarget(currentPosition, targetPowerPill, Constants.DM.PATH);
+    		return move;
+    	}else{
+            Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(currentPosition,
+                    currentPacPosition, lastMove, Constants.DM.PATH);
+            return move;
+    	} 
+    	    
     }
 }
