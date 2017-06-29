@@ -34,7 +34,7 @@ public class MyPacMan extends PacmanController {
 		m_policy = new Policy();
 		m_map = new Mapping();
 		m_ghosts = new POCommGhosts(50);
-		m_maxLookahead = 5;
+		m_maxLookahead = 7;
 		m_maxNegPoints = (m_maxLookahead-1)*m_policy.pill + m_policy.ghost;
 		m_minNegPoints = m_maxLookahead * m_policy.step;
 	}
@@ -131,28 +131,23 @@ public class MyPacMan extends PacmanController {
 				continue;
 
 			//rewards[i] = game.getScore();
-			
 			// TODO: use better prediction (e.g. powerpill only when ghosts available, check if you can see ghosts)
 			if(gameCopies[i].wasPillEaten())
-				rewards[i] = m_policy.pill;
+				rewards[i] += m_policy.pill;
 			if(gameCopies[i].wasPowerPillEaten())
-				rewards[i] = m_policy.powerPill;
+				rewards[i] += m_policy.powerPill;
 			if(gameCopies[i].wasPacManEaten())
-			{
-				System.out.println("GHOST!");
-				return m_policy.ghost;
-			}
-				
+				return m_policy.ghost;				
 			if(gameCopies[i].wasGhostEaten(GHOST.BLINKY))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
 			if(gameCopies[i].wasGhostEaten(GHOST.SUE))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
 			if(gameCopies[i].wasGhostEaten(GHOST.INKY))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
 			if(gameCopies[i].wasGhostEaten(GHOST.PINKY))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
 			
-				rewards[i] = m_policy.step;
+				rewards[i] += m_policy.step;
 
 
 			rewards[i] += computeMove(currentStep+1, maxSteps, moves[i], idx, gameCopies[i]);
