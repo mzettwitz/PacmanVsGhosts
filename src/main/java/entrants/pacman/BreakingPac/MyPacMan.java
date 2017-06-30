@@ -34,15 +34,18 @@ public class MyPacMan extends PacmanController {
 		m_policy = new Policy();
 		m_map = new Mapping();
 		m_ghosts = new POCommGhosts(50);
-		m_maxLookahead = 5;
+		m_maxLookahead = 7;
 		m_maxNegPoints = (m_maxLookahead-1)*m_policy.pill + m_policy.ghost;
 		m_minNegPoints = m_maxLookahead * m_policy.step;
 	}
 
+	// ------------------------------------------------------------------------------------------------------------------------------
+	
 	public MOVE getMove(Game game, long timeDue) {
 		//Place your game logic here to play the game as Ms Pac-Man
 		if(game.getCurrentLevelTime() < 1)
 			m_visitedNodes = new int [game.getNumberOfNodes()];
+
 
 
 		MOVE [] _moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
@@ -65,7 +68,7 @@ public class MyPacMan extends PacmanController {
 				MOVE.NEUTRAL
 				));
 		simGame = game.getGameFromInfo(info);
-
+		
 		// simulate all moves
 		for (int i = 0; i < moves.size(); i++)
 		{
@@ -103,7 +106,8 @@ public class MyPacMan extends PacmanController {
 		return localExplore.second;
 	}
 
-
+	// ------------------------------------------------------------------------------------------------------------------------------
+	
 	private int computeMove(int currentStep, final int maxSteps, MOVE move, int nodeIdx, Game game)
 	{
 		// check if max depth is reached
@@ -115,36 +119,35 @@ public class MyPacMan extends PacmanController {
 		int [] rewards = new int [moves.length];
 		Game [] gameCopies = new Game[moves.length];
 		int max = 0;
-
+		 MASController ghosts = new POCommGhosts(50);
+		
 		// advance game for each possible move
 		for (int i = 0; i < moves.length; i++) {			
 			gameCopies[i] = game.copy();
-			gameCopies[i].advanceGame(moves[i],m_ghosts.getMove(gameCopies[i], 40));
+			gameCopies[i].advanceGame(moves[i], ghosts.getMove(gameCopies[i].copy(), 40));
 
 			int idx = gameCopies[i].getPacmanCurrentNodeIndex();
 			if(idx == -1)
 				continue;
 
 			//rewards[i] = game.getScore();
-
-
 			// TODO: use better prediction (e.g. powerpill only when ghosts available, check if you can see ghosts)
 			if(gameCopies[i].wasPillEaten())
-				rewards[i] = m_policy.pill;
-			else if(gameCopies[i].wasPowerPillEaten())
-				rewards[i] = m_policy.powerPill;
-			else if(gameCopies[i].wasPacManEaten())
-				return m_policy.ghost;
-			else if(gameCopies[i].wasGhostEaten(GHOST.BLINKY))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
-			else if(gameCopies[i].wasGhostEaten(GHOST.SUE))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
-			else if(gameCopies[i].wasGhostEaten(GHOST.INKY))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
-			else if(gameCopies[i].wasGhostEaten(GHOST.PINKY))
-				rewards[i] = m_policy.ghost * m_policy.ppGhostMulti;
-			else 
-				rewards[i] = m_policy.step;
+				rewards[i] += m_policy.pill;
+			if(gameCopies[i].wasPowerPillEaten())
+				rewards[i] += m_policy.powerPill;
+			if(gameCopies[i].wasPacManEaten())
+				return m_policy.ghost;				
+			if(gameCopies[i].wasGhostEaten(GHOST.BLINKY))
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
+			if(gameCopies[i].wasGhostEaten(GHOST.SUE))
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
+			if(gameCopies[i].wasGhostEaten(GHOST.INKY))
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
+			if(gameCopies[i].wasGhostEaten(GHOST.PINKY))
+				rewards[i] += m_policy.ghost * m_policy.ppGhostMulti;
+			
+				rewards[i] += m_policy.step;
 
 
 			rewards[i] += computeMove(currentStep+1, maxSteps, moves[i], idx, gameCopies[i]);
@@ -155,7 +158,8 @@ public class MyPacMan extends PacmanController {
 		return max;
 	}
 
-
+	// ------------------------------------------------------------------------------------------------------------------------------
+	
 	// Internal storage
 	private class Mapping
 	{
@@ -169,10 +173,12 @@ public class MyPacMan extends PacmanController {
 		}
 	}
 
+	// ------------------------------------------------------------------------------------------------------------------------------
+	
 	// Internal policy
 	private class Policy
 	{
-		int ghost = -200;
+		int ghost = -500;
 		int pill = 10;
 		int step = -2;
 		int powerPill = -50;
@@ -180,7 +186,8 @@ public class MyPacMan extends PacmanController {
 		int ppGhostMulti = -2;	// use ghost * ppGhostMulti while PP is active
 	}
 
-
+	// ------------------------------------------------------------------------------------------------------------------------------
+	
 	private class Pair<F, S> 
 	{
 		F first;
@@ -193,6 +200,8 @@ public class MyPacMan extends PacmanController {
 		}
 		Pair(){}
 	}
+	
+	// ------------------------------------------------------------------------------------------------------------------------------
 
 	private void sortRewardedMoves(ArrayList<Pair<Integer, MOVE> > list)
 	{
