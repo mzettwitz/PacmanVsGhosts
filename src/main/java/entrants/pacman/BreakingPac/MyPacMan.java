@@ -30,14 +30,13 @@ public class MyPacMan extends PacmanController {
 	private int m_minNegPoints;
 
 
-	// Constructor: 100ms to compute: build up initial map
 	public MyPacMan()
 	{
 		m_policy = new Policy();
 		m_map = new Mapping();
 		m_ghosts = new POCommGhosts(50);
 		m_maxLookahead = 5;
-		m_safety = 5;
+		m_safety = 10;
 		m_maxNegPoints = (m_maxLookahead-1)*m_policy.pill + m_policy.ghost;
 		m_minNegPoints = m_maxLookahead * m_policy.step;
 	}
@@ -93,60 +92,60 @@ public class MyPacMan extends PacmanController {
 		{
 			if(game.isGhostEdible(GHOST.BLINKY))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, blinkyIdx, DM.PATH);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, blinkyIdx, DM.PATH);
 			}				
-			else if(game.getDistance(nodeIdx, blinkyIdx, DM.MANHATTAN) <= m_safety)
+			else if(game.getDistance(nodeIdx, blinkyIdx, DM.PATH) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, blinkyIdx, DM.PATH);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, blinkyIdx, DM.PATH);
 			}
 		}
 		if(pinkyIdx != -1)
 		{
 			if(game.isGhostEdible(GHOST.PINKY))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, pinkyIdx, DM.PATH);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, pinkyIdx, DM.PATH);
 			}				
-			else if(game.getDistance(nodeIdx, pinkyIdx, DM.MANHATTAN) <= m_safety)
+			else if(game.getDistance(nodeIdx, pinkyIdx, DM.PATH) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, pinkyIdx, DM.PATH);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, pinkyIdx, DM.PATH);
 			}
 		}
 		if(inkyIdx != -1)
 		{
 			if(game.isGhostEdible(GHOST.INKY))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, inkyIdx, DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, inkyIdx, DM.PATH);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, inkyIdx, DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, inkyIdx, DM.PATH);
 			}				
-			else if(game.getDistance(nodeIdx, inkyIdx, DM.MANHATTAN) <= m_safety)
+			else if(game.getDistance(nodeIdx, inkyIdx, DM.PATH) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, inkyIdx, DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, inkyIdx, DM.PATH);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, inkyIdx, DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, inkyIdx, DM.PATH);
 			}
 		}
 		if(sueIdx != -1)
 		{
 			if(game.isGhostEdible(GHOST.SUE))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, sueIdx, DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, sueIdx, DM.PATH);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, sueIdx, DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, sueIdx, DM.PATH);
 			}				
-			else if(game.getDistance(nodeIdx, sueIdx, DM.MANHATTAN) <= m_safety)
+			else if(game.getDistance(nodeIdx, sueIdx, DM.PATH) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, sueIdx, DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, sueIdx, DM.PATH);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, sueIdx, DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, sueIdx, DM.PATH);
 			}
 		}
 
