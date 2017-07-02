@@ -7,6 +7,7 @@ import java.util.Random;
 import pacman.controllers.MASController;
 import pacman.controllers.PacmanController;
 import pacman.controllers.examples.po.POCommGhosts;
+import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
@@ -79,12 +80,78 @@ public class MyPacMan extends PacmanController {
 		// sort moves to get best moves in ascending order
 		sortRewardedMoves(rewardedMoves);
 		// loop descending 
+		
+		// Flee or chase ghosts
+		if(game.getGhostCurrentNodeIndex(GHOST.BLINKY) != -1)
+		{
+			if(game.isGhostEdible(GHOST.BLINKY))
+			{	
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);
+			}				
+			else
+			{
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);;
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);
+			}
+		}
+		if(game.getGhostCurrentNodeIndex(GHOST.INKY) != -1)
+		{
+			if(game.isGhostEdible(GHOST.INKY))
+			{	
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);
+			}				
+			else
+			{
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);;
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);
+			}
+		}
+		if(game.getGhostCurrentNodeIndex(GHOST.PINKY) != -1)
+		{
+			if(game.isGhostEdible(GHOST.PINKY))
+			{	
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);
+			}				
+			else
+			{
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);;
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);
+			}
+		}
+		if(game.getGhostCurrentNodeIndex(GHOST.SUE) != -1)
+		{
+			if(game.isGhostEdible(GHOST.SUE))
+			{	
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);
+			}				
+			else
+			{
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);;
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);
+			}
+		}
+
+
+		
 		for(int i = rewardedMoves.size()-1; i >= 0; i--)
 		{
 			// check if next node was visited before
 			int neighbor = game.getNeighbour(nodeIdx, rewardedMoves.get(i).second);
+
 			// add next node to visited nodes
-			if(m_visitedNodes[neighbor] == 0)
+			if(m_visitedNodes[neighbor] == 0 && rewardedMoves.get(i).first > m_maxNegPoints)
 			{
 				m_visitedNodes[neighbor]++;
 				return rewardedMoves.get(i).second;
