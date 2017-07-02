@@ -1,5 +1,7 @@
 package entrants.ghosts.BreakingPac;
 
+import java.util.Arrays;
+
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
 import pacman.game.Constants;
@@ -16,23 +18,27 @@ public class Blinky extends IndividualGhostController {
     public Blinky() {
         super(Constants.GHOST.BLINKY);
     }
-
+public static int powerPillIndex = 0;
     @Override
     public Constants.MOVE getMove(Game game, long timeDue) {
     	// simply obtain all possible moves(remember: ghost are only able to run forward and left/right, but stay at position
-Constants.MOVE lastMove = game.getGhostLastMoveMade(GHOST.BLINKY);
-int currentPosition = game.getGhostCurrentNodeIndex(GHOST.BLINKY);
-int currentPacPosition = game.getPacmanCurrentNodeIndex();
-int targetPowerPill = game.getPowerPillIndices()[0];
-int distanceToPowerPill = game.getShortestPathDistance(currentPosition,targetPowerPill);
-int distancePacToPowerPill = game.getShortestPathDistance(currentPacPosition, targetPowerPill);
-if(distanceToPowerPill > distancePacToPowerPill){
-	Constants.MOVE move = game.getNextMoveTowardsTarget(currentPosition, targetPowerPill, Constants.DM.PATH);
-	return move;
-}else{
-    Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(currentPosition,
-            currentPacPosition, lastMove, Constants.DM.PATH);
-    return move;
-}
+		Constants.MOVE lastMove = game.getGhostLastMoveMade(GHOST.BLINKY);
+		int currentPosition = game.getGhostCurrentNodeIndex(GHOST.BLINKY);
+		int currentPacPosition = game.getPacmanCurrentNodeIndex();
+		int targetPowerPill = game.getPowerPillIndices()[powerPillIndex];
+		if(currentPosition == targetPowerPill && !game.isPowerPillStillAvailable(game.getPowerPillIndex(targetPowerPill)))
+		{
+			powerPillIndex = Pinky.powerPillIndex;
+		}
+		int distanceToPowerPill = game.getShortestPathDistance(currentPosition,targetPowerPill);
+		int distancePacToPowerPill = game.getShortestPathDistance(currentPacPosition, targetPowerPill);
+		if(distanceToPowerPill > distancePacToPowerPill){
+			Constants.MOVE move = game.getNextMoveTowardsTarget(currentPosition, targetPowerPill, Constants.DM.PATH);
+			return move;
+		}else{
+		    Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(currentPosition,
+		            currentPacPosition, lastMove, Constants.DM.PATH);
+		    return move;
+		}
     }
 }
