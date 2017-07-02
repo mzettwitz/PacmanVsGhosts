@@ -1,6 +1,7 @@
 package entrants.ghosts.BreakingPac;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
@@ -19,26 +20,43 @@ public class Blinky extends IndividualGhostController {
         super(Constants.GHOST.BLINKY);
     }
 public static int powerPillIndex = 0;
+public static int pillIndex = -1;
+private int targetPill = -1;
+Random rnd = new Random();
     @Override
     public Constants.MOVE getMove(Game game, long timeDue) {
-    	// simply obtain all possible moves(remember: ghost are only able to run forward and left/right, but stay at position
-		Constants.MOVE lastMove = game.getGhostLastMoveMade(GHOST.BLINKY);
 		int currentPosition = game.getGhostCurrentNodeIndex(GHOST.BLINKY);
 		int currentPacPosition = game.getPacmanCurrentNodeIndex();
-		int targetPowerPill = game.getPowerPillIndices()[powerPillIndex];
-		if(currentPosition == targetPowerPill && !game.isPowerPillStillAvailable(game.getPowerPillIndex(targetPowerPill)))
-		{
-			powerPillIndex = Pinky.powerPillIndex;
+		if(Sue.pillIndex > 0 || Inky.powerPillIndex > 0 || Pinky.powerPillIndex > 0){
+			pillIndex = Math.max(Math.max(Sue.pillIndex, Pinky.pillIndex), Inky.pillIndex);
 		}
-		int distanceToPowerPill = game.getShortestPathDistance(currentPosition,targetPowerPill);
-		int distancePacToPowerPill = game.getShortestPathDistance(currentPacPosition, targetPowerPill);
-		if(distanceToPowerPill > distancePacToPowerPill){
-			Constants.MOVE move = game.getNextMoveTowardsTarget(currentPosition, targetPowerPill, Constants.DM.PATH);
-			return move;
-		}else{
-		    Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(currentPosition,
-		            currentPacPosition, lastMove, Constants.DM.PATH);
-		    return move;
-		}
+    	if(game.getNumberOfPowerPills() == 0 && pillIndex == -1 && !game.isPillStillAvailable(currentPosition)){
+            Constants.MOVE[] possibleMoves = game.getPossibleMoves(currentPosition, game.getGhostLastMoveMade(GHOST.BLINKY));
+            return possibleMoves[rnd.nextInt(possibleMoves.length)];
+    	}else{
+			Constants.MOVE lastMove = game.getGhostLastMoveMade(GHOST.BLINKY);
+			if(game.getNumberOfActivePills() != 0){
+				targetPill = game.getPowerPillIndices()[powerPillIndex];
+				if(currentPosition == targetPill && !game.isPowerPillStillAvailable(game.getPowerPillIndex(targetPill)))
+				{
+					powerPillIndex = Pinky.powerPillIndex;
+				}
+			}else if(pillIndex == -1){
+				pillIndex = currentPosition;
+				
+			}else{
+				targetPill = pillIndex;
+			}
+			int distanceToPowerPill = game.getShortestPathDistance(currentPosition,targetPill);
+			int distancePacToPowerPill = game.getShortestPathDistance(currentPacPosition, targetPill);
+			if(distanceToPowerPill > distancePacToPowerPill){
+				Constants.MOVE move = game.getNextMoveTowardsTarget(currentPosition, targetPill, Constants.DM.PATH);
+				return move;
+			}else{
+			    Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(currentPosition,
+			            currentPacPosition, lastMove, Constants.DM.PATH);
+			    return move;
+			}
+    	}
     }
 }
