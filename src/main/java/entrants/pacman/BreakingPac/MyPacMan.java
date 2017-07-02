@@ -25,6 +25,7 @@ public class MyPacMan extends PacmanController {
 	private MASController m_ghosts;
 	private int [] m_visitedNodes;
 	private int m_maxLookahead;
+	private int m_safety;
 	private int m_maxNegPoints;
 	private int m_minNegPoints;
 
@@ -35,7 +36,8 @@ public class MyPacMan extends PacmanController {
 		m_policy = new Policy();
 		m_map = new Mapping();
 		m_ghosts = new POCommGhosts(50);
-		m_maxLookahead = 7;
+		m_maxLookahead = 5;
+		m_safety = 5;
 		m_maxNegPoints = (m_maxLookahead-1)*m_policy.pill + m_policy.ghost;
 		m_minNegPoints = m_maxLookahead * m_policy.step;
 	}
@@ -82,64 +84,69 @@ public class MyPacMan extends PacmanController {
 		// loop descending 
 		
 		// Flee or chase ghosts
-		if(game.getGhostCurrentNodeIndex(GHOST.BLINKY) != -1)
+		int blinkyIdx = game.getGhostCurrentNodeIndex(GHOST.BLINKY);
+		int inkyIdx = game.getGhostCurrentNodeIndex(GHOST.INKY);
+		int pinkyIdx = game.getGhostCurrentNodeIndex(GHOST.PINKY);
+		int sueIdx = game.getGhostCurrentNodeIndex(GHOST.SUE);
+		
+		if(blinkyIdx != -1)
 		{
 			if(game.isGhostEdible(GHOST.BLINKY))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);
 			}				
-			else
+			else if(game.getDistance(nodeIdx, blinkyIdx, DM.MANHATTAN) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, blinkyIdx, DM.MANHATTAN);
 			}
 		}
-		if(game.getGhostCurrentNodeIndex(GHOST.INKY) != -1)
-		{
-			if(game.isGhostEdible(GHOST.INKY))
-			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);
-				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);
-			}				
-			else
-			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);;
-				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.INKY), DM.MANHATTAN);
-			}
-		}
-		if(game.getGhostCurrentNodeIndex(GHOST.PINKY) != -1)
+		if(pinkyIdx != -1)
 		{
 			if(game.isGhostEdible(GHOST.PINKY))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);
 			}				
-			else
+			else if(game.getDistance(nodeIdx, pinkyIdx, DM.MANHATTAN) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, pinkyIdx, DM.MANHATTAN);
 			}
 		}
-		if(game.getGhostCurrentNodeIndex(GHOST.SUE) != -1)
+		if(inkyIdx != -1)
+		{
+			if(game.isGhostEdible(GHOST.INKY))
+			{	
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, inkyIdx, DM.MANHATTAN);
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveTowardsTarget(nodeIdx, inkyIdx, DM.MANHATTAN);
+			}				
+			else if(game.getDistance(nodeIdx, inkyIdx, DM.MANHATTAN) <= m_safety)
+			{
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, inkyIdx, DM.MANHATTAN);;
+				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
+				return game.getNextMoveAwayFromTarget(nodeIdx, inkyIdx, DM.MANHATTAN);
+			}
+		}
+		if(sueIdx != -1)
 		{
 			if(game.isGhostEdible(GHOST.SUE))
 			{	
-				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);
+				MOVE m = game.getNextMoveTowardsTarget(nodeIdx, sueIdx, DM.MANHATTAN);
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveTowardsTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);
+				return game.getNextMoveTowardsTarget(nodeIdx, sueIdx, DM.MANHATTAN);
 			}				
-			else
+			else if(game.getDistance(nodeIdx, sueIdx, DM.MANHATTAN) <= m_safety)
 			{
-				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);;
+				MOVE m = game.getNextMoveAwayFromTarget(nodeIdx, sueIdx, DM.MANHATTAN);;
 				m_visitedNodes[game.getNeighbour(nodeIdx, m)]++;
-				return game.getNextMoveAwayFromTarget(nodeIdx, game.getGhostCurrentNodeIndex(GHOST.SUE), DM.MANHATTAN);
+				return game.getNextMoveAwayFromTarget(nodeIdx, sueIdx, DM.MANHATTAN);
 			}
 		}
 
@@ -163,6 +170,7 @@ public class MyPacMan extends PacmanController {
 				localExplore.first = m_visitedNodes[neighbor];
 			}
 		}
+		
 
 		if(localExplore.first < m_minNegPoints)
 		{
